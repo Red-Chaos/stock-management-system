@@ -1,12 +1,24 @@
 import { prisma } from '@/lib/prisma';
-import { Package, AlertTriangle, XCircle, Layers, Activity } from 'lucide-react';
+import { Package, AlertTriangle, XCircle, Layers, Activity, DollarSign, FileText, Briefcase } from 'lucide-react';
 import Link from 'next/link';
+import { formatCurrency } from '@/lib/utils';
 
 export default async function DashboardPage() {
   const totalItems = await prisma.stockItem.count();
   const lowStock = await prisma.stockItem.count({ where: { status: 'LOW_STOCK' } });
   const outOfStock = await prisma.stockItem.count({ where: { status: 'OUT_OF_STOCK' } });
   const sectionsCount = await prisma.section.count();
+
+  const allItems = await prisma.stockItem.findMany({ select: { price: true, quantity: true } });
+  const totalStockValue = allItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+  const pendingPOs = await prisma.purchaseOrder.count({
+    where: { status: { in: ['SUBMITTED', 'CONFIRMED', 'SHIPPED'] } }
+  });
+
+  const activeProjects = await prisma.project.count({
+    where: { status: { in: ['IN_PROGRESS', 'PLANNING'] } }
+  });
 
   const recentActivity = await prisma.activityLog.findMany({
     take: 5,
@@ -57,6 +69,36 @@ export default async function DashboardPage() {
           <div>
             <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Out of Stock</div>
             <div style={{ fontSize: '24px', fontWeight: 700 }}>{outOfStock}</div>
+          </div>
+        </div>
+
+        <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(255, 235, 59, 0.1)', color: '#FBC02D' }}>
+            <DollarSign size={28} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Inventory Value</div>
+            <div style={{ fontSize: '24px', fontWeight: 700 }}>{formatCurrency(totalStockValue, 'USD')}</div>
+          </div>
+        </div>
+
+        <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(124, 77, 255, 0.1)', color: '#7C4DFF' }}>
+            <FileText size={28} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Pending Orders</div>
+            <div style={{ fontSize: '24px', fontWeight: 700 }}>{pendingPOs}</div>
+          </div>
+        </div>
+
+        <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(0, 230, 118, 0.1)', color: '#00E676' }}>
+            <Briefcase size={28} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Active Projects</div>
+            <div style={{ fontSize: '24px', fontWeight: 700 }}>{activeProjects}</div>
           </div>
         </div>
 

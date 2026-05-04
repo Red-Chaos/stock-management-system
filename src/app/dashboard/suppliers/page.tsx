@@ -57,10 +57,10 @@ export default async function SuppliersPage() {
               <div style={{ color: 'var(--text-secondary)' }}>
                 <strong style={{ color: 'var(--text-primary)' }}>{supplier._count.purchaseOrders}</strong> Orders
               </div>
-              {supplier.rating > 0 && (
+              {supplier.rating !== null && supplier.rating > 0 && (
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: '2px', color: 'var(--warning)' }}>
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} style={{ opacity: i < supplier.rating! ? 1 : 0.3 }}>★</span>
+                    <span key={i} style={{ opacity: i < (supplier.rating ?? 0) ? 1 : 0.3 }}>★</span>
                   ))}
                 </div>
               )}

@@ -4,6 +4,7 @@ import { Package, Plus, Search, Filter } from 'lucide-react';
 import DevButtons from './DevButtons';
 import { getExchangeRates, convertCurrency } from '@/lib/currency';
 import { formatCurrency } from '@/lib/utils';
+import ItemsTableClient from './ItemsTableClient';
 
 export default async function ItemsPage(props: {
   searchParams: Promise<{ search?: string; sectionId?: string; status?: string; page?: string }>
@@ -93,66 +94,28 @@ export default async function ItemsPage(props: {
           </button>
         </form>
 
-        {/* Items Table */}
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                <th style={{ padding: '16px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.9rem' }}>Item Code</th>
-                <th style={{ padding: '16px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.9rem' }}>Name</th>
-                <th style={{ padding: '16px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.9rem' }}>Section / Category</th>
-                <th style={{ padding: '16px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.9rem' }}>Stock</th>
-                <th style={{ padding: '16px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.9rem' }}>Price (USD)</th>
-                <th style={{ padding: '16px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.9rem' }}>Price (PKR)</th>
-                <th style={{ padding: '16px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.9rem' }}>Status</th>
-                <th style={{ padding: '16px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.9rem' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 ? (
-                <tr>
-                  <td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    No items found matching your criteria.
-                  </td>
-                </tr>
-              ) : (
-                items.map(item => (
-                  <tr key={item.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.2s' }} className="hover:bg-[var(--bg-card-hover)]">
-                    <td style={{ padding: '16px', fontFamily: 'monospace', fontSize: '0.9rem' }}>{item.itemCode}</td>
-                    <td style={{ padding: '16px', fontWeight: 500 }}>{item.name}</td>
-                    <td style={{ padding: '16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.section.color }}></div>
-                        {item.section.name} <span style={{ color: 'var(--text-muted)' }}>/ {item.category.name}</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px' }}>{item.quantity}</td>
-                    <td style={{ padding: '16px', fontWeight: 500 }}>
-                      {formatCurrency(convertCurrency(item.price, item.priceCurrency, 'USD', rates), 'USD')}
-                    </td>
-                    <td style={{ padding: '16px', color: 'var(--text-secondary)' }}>
-                      {formatCurrency(convertCurrency(item.price, item.priceCurrency, 'PKR', rates), 'PKR')}
-                    </td>
-                    <td style={{ padding: '16px' }}>
-                      <span style={{
-                        padding: '4px 12px', borderRadius: '16px', fontSize: '0.8rem', fontWeight: 600,
-                        background: item.status === 'ACTIVE' ? 'rgba(0, 200, 83, 0.1)' : item.status === 'LOW_STOCK' ? 'rgba(255, 145, 0, 0.1)' : 'rgba(255, 23, 68, 0.1)',
-                        color: item.status === 'ACTIVE' ? 'var(--success)' : item.status === 'LOW_STOCK' ? 'var(--warning)' : 'var(--danger)'
-                      }}>
-                        {item.status.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td style={{ padding: '16px' }}>
-                      <Link href={`/dashboard/items/${item.id}`} style={{ color: 'var(--secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.9rem' }}>
-                        View Details
-                      </Link>
-                    </td>
-                  </tr>
-                ))
+        <ItemsTableClient items={items} rates={rates} />
+
+        {/* Pagination UI */}
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px', padding: '16px 0 0 0', borderTop: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} items
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {currentPage > 1 && (
+                <Link href={`/dashboard/items?page=${currentPage - 1}&search=${search}&sectionId=${sectionId}&status=${statusParam}`} className="btn btn-secondary" style={{ padding: '6px 12px' }}>
+                  Previous
+                </Link>
               )}
-            </tbody>
-          </table>
-        </div>
+              {currentPage < totalPages && (
+                <Link href={`/dashboard/items?page=${currentPage + 1}&search=${search}&sectionId=${sectionId}&status=${statusParam}`} className="btn btn-secondary" style={{ padding: '6px 12px' }}>
+                  Next
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

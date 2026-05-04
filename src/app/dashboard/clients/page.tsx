@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { Users, Building, Phone, Mail, MapPin, Briefcase } from 'lucide-react';
 import NewClientModal from './NewClientModal';
 import EditClientModal from './EditClientModal';
+import NewQuotationModal from './NewQuotationModal';
 
 export default async function ClientsPage() {
   const session = await getServerSession(authOptions);
@@ -15,6 +16,8 @@ export default async function ClientsPage() {
     }
   });
 
+  const stockItems = await prisma.stockItem.findMany({ select: { id: true, name: true, price: true } });
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -22,7 +25,10 @@ export default async function ClientsPage() {
           <h1 style={{ fontSize: '24px', fontWeight: 700 }}>Clients</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Manage organizations and project clients</p>
         </div>
-        <NewClientModal />
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <NewQuotationModal clients={clients} stockItems={stockItems} />
+          <NewClientModal />
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '24px' }}>

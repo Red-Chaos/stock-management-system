@@ -30,6 +30,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       sectionSpecificFields: data.sectionSpecificFields,
     };
 
+    if (data.imageUrl) {
+      updateData.images = {
+        deleteMany: {},
+        create: { url: data.imageUrl }
+      };
+    }
+
     if (data.purchaseDate) updateData.purchaseDate = new Date(data.purchaseDate);
     if (data.warrantyExpiry) updateData.warrantyExpiry = new Date(data.warrantyExpiry);
     if (data.calibrationDate) updateData.calibrationDate = new Date(data.calibrationDate);

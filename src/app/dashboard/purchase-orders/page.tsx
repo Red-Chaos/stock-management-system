@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { ShoppingCart, FileText, Calendar, Truck, DollarSign, Building } from 'lucide-react';
@@ -76,11 +77,9 @@ export default async function PurchaseOrdersPage() {
                 }}>
                   {po.status.replace(/_/g, ' ')}
                 </span>
-                {po.receivedDate && (
-                  <span style={{ marginLeft: 'auto', color: 'var(--text-secondary)' }}>
-                    Received: {new Date(po.receivedDate).toLocaleDateString()}
-                  </span>
-                )}
+                <Link href={`/dashboard/purchase-orders/${po.id}`} style={{ marginLeft: 'auto', color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>
+                  View / Print
+                </Link>
               </div>
             </div>
           );

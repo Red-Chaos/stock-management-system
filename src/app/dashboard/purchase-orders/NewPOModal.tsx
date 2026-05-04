@@ -16,6 +16,29 @@ export default function NewPOModal({ suppliers, stockItems }: { suppliers: any[]
   const [shippingCost, setShippingCost] = useState(0);
   const [notes, setNotes] = useState('');
   const [items, setItems] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+
+  const fetchTemplates = async () => {
+    const res = await fetch('/api/purchase-orders/templates');
+    const data = await res.json();
+    if (Array.isArray(data)) setTemplates(data);
+  };
+
+  const loadTemplate = (id: string) => {
+    const t = templates.find(temp => temp.id === id);
+    if (t) {
+      setSupplierId(t.supplierId || '');
+      setCurrency(t.currency);
+      setItems(t.items.map((i: any) => ({
+        stockItemId: i.stockItemId || '',
+        itemName: i.itemName,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice
+      })));
+    }
+  };
 
   const addItem = () => {
     setItems([...items, { stockItemId: '', itemName: '', quantity: 1, unitPrice: 0 }]);
@@ -69,6 +92,19 @@ export default function NewPOModal({ suppliers, stockItems }: { suppliers: any[]
       });
       
       if (res.ok) {
+        if (saveAsTemplate && templateName) {
+          await fetch('/api/purchase-orders/templates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: templateName,
+              supplierId,
+              currency,
+              description: notes,
+              items
+            })
+          });
+        }
         setIsOpen(false);
         setSupplierId('');
         setItems([]);
@@ -98,6 +134,19 @@ export default function NewPOModal({ suppliers, stockItems }: { suppliers: any[]
             </button>
             
             <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '24px' }}>Create Purchase Order</h2>
+
+            <div style={{ marginBottom: '24px', padding: '16px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Quick Start: Load from Template</label>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <select onChange={e => loadTemplate(e.target.value)} onClick={fetchTemplates}>
+                  <option value="">Select Template...</option>
+                  {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+                <button type="button" onClick={fetchTemplates} className="btn btn-secondary" style={{ padding: '8px' }}>
+                  Refresh
+                </button>
+              </div>
+            </div>
             
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -186,6 +235,27 @@ export default function NewPOModal({ suppliers, stockItems }: { suppliers: any[]
               <div>
                 <label>Notes / Terms</label>
                 <textarea rows={2} value={notes} onChange={e => setNotes(e.target.value)}></textarea>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', borderRadius: '8px', background: 'rgba(0, 200, 83, 0.05)' }}>
+                <input 
+                  type="checkbox" 
+                  id="saveTemplate" 
+                  checked={saveAsTemplate} 
+                  onChange={e => setSaveAsTemplate(e.target.checked)}
+                  style={{ width: '18px', height: '18px' }}
+                />
+                <label htmlFor="saveTemplate" style={{ cursor: 'pointer', margin: 0, fontWeight: 600 }}>Save this configuration as a template</label>
+                {saveAsTemplate && (
+                  <input 
+                    type="text" 
+                    placeholder="Template Name..." 
+                    value={templateName} 
+                    onChange={e => setTemplateName(e.target.value)}
+                    required
+                    style={{ flex: 1, padding: '8px' }}
+                  />
+                )}
               </div>
               
               <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>

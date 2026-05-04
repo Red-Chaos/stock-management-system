@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { Briefcase, Calendar, MapPin, Building, DollarSign } from 'lucide-react';
@@ -62,6 +63,9 @@ export default async function ProjectsPage() {
               }}>
                 {project.status.replace('_', ' ')}
               </span>
+              <Link href={`/dashboard/projects/${project.id}`} style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>
+                View Project
+              </Link>
             </div>
           </div>
         ))}

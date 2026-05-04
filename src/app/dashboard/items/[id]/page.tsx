@@ -22,7 +22,8 @@ export default async function ItemDetailPage({ params }: { params: Promise<{ id:
       },
       parts: {
         include: { partItem: { select: { quantity: true, status: true } } }
-      }
+      },
+      images: true
     }
   });
 
@@ -63,6 +64,15 @@ export default async function ItemDetailPage({ params }: { params: Promise<{ id:
             </p>
           </div>
         </div>
+        {item.images?.[0] && (
+          <div style={{ marginRight: 'auto', marginLeft: '24px' }}>
+            <img 
+              src={item.images[0].url} 
+              alt={item.name} 
+              style={{ width: '80px', height: '80px', borderRadius: '12px', objectFit: 'cover', border: '2px solid var(--border)' }}
+            />
+          </div>
+        )}
         <div style={{ display: 'flex', gap: '12px' }}>
           <Link href={`/dashboard/items/${item.id}/edit`} className="btn btn-secondary">
             <Edit size={16} /> Edit Item
@@ -176,6 +186,14 @@ export default async function ItemDetailPage({ params }: { params: Promise<{ id:
               {item.quantity}
             </div>
             <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Min Level: {item.minStockLevel}</div>
+            <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${item.id}`} 
+                alt="QR Code" 
+                style={{ borderRadius: '8px', border: '4px solid white', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}
+              />
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>Scan to view item</span>
+            </div>
           </div>
 
           {/* Adjust Stock Form (Client Component) */}

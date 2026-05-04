@@ -14,7 +14,9 @@ import {
   Menu,
   X,
   FileDown,
-  Settings
+  Settings,
+  Briefcase,
+  Building2
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getCompanyName } from '@/app/actions/settings';
@@ -39,10 +41,12 @@ export default function DashboardLayout({
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Sections', href: '/dashboard/sections', icon: Layers },
     { name: 'Stock Items', href: '/dashboard/items', icon: Package },
+    { name: 'Purchase Orders', href: '/dashboard/purchase-orders', icon: FileDown },
+    { name: 'Clients', href: '/dashboard/clients', icon: Users },
+    { name: 'Projects', href: '/dashboard/projects', icon: Briefcase },
     { name: 'Suppliers', href: '/dashboard/suppliers', icon: Users },
-    { name: 'Warehouses', href: '/dashboard/warehouses', icon: LayoutDashboard },
+    { name: 'Warehouses', href: '/dashboard/warehouses', icon: Building2 },
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-    { name: 'Export / Import', href: '/dashboard/export-import', icon: FileDown },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 

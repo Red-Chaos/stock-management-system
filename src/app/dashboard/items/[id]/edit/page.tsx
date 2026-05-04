@@ -77,6 +77,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
           trackingNumber: item.trackingNumber || '',
           description: item.description || '',
           sectionSpecificFields: item.sectionSpecificFields || {},
+          imageUrl: item.images?.[0]?.url || '',
           parts: item.parts || []
         });
       }
@@ -155,22 +156,22 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           <div>
             <label>Equipment Type</label>
-            <input type="text" onChange={e => updateSpecificField('equipmentType', e.target.value)} />
+            <input type="text" value={formData.sectionSpecificFields.equipmentType || ''} onChange={e => updateSpecificField('equipmentType', e.target.value)} />
           </div>
           <div>
             <label>Plug Type</label>
-            <select onChange={e => updateSpecificField('plugType', e.target.value)}>
+            <select value={formData.sectionSpecificFields.plugType || ''} onChange={e => updateSpecificField('plugType', e.target.value)}>
               <option value="">Select Plug...</option>
               {PLUG_TYPES.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
           <div>
             <label>Power Requirements</label>
-            <input type="text" placeholder="e.g. 220V 50Hz" onChange={e => updateSpecificField('powerRequirements', e.target.value)} />
+            <input type="text" placeholder="e.g. 220V 50Hz" value={formData.sectionSpecificFields.powerRequirements || ''} onChange={e => updateSpecificField('powerRequirements', e.target.value)} />
           </div>
           <div>
             <label>Measurement Range</label>
-            <input type="text" onChange={e => updateSpecificField('measurementRange', e.target.value)} />
+            <input type="text" value={formData.sectionSpecificFields.measurementRange || ''} onChange={e => updateSpecificField('measurementRange', e.target.value)} />
           </div>
         </div>
       );
@@ -181,11 +182,11 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           <div>
             <label>CAS Number</label>
-            <input type="text" onChange={e => updateSpecificField('casNumber', e.target.value)} />
+            <input type="text" value={formData.sectionSpecificFields.casNumber || ''} onChange={e => updateSpecificField('casNumber', e.target.value)} />
           </div>
           <div>
             <label>Physical State</label>
-            <select onChange={e => updateSpecificField('physicalState', e.target.value)}>
+            <select value={formData.sectionSpecificFields.physicalState || ''} onChange={e => updateSpecificField('physicalState', e.target.value)}>
               <option value="">Select...</option>
               <option value="Solid">Solid</option>
               <option value="Liquid">Liquid</option>
@@ -194,7 +195,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
           </div>
           <div>
             <label>Dilution Status</label>
-            <select onChange={e => updateSpecificField('dilutionStatus', e.target.value)}>
+            <select value={formData.sectionSpecificFields.dilutionStatus || ''} onChange={e => updateSpecificField('dilutionStatus', e.target.value)}>
               <option value="">Select...</option>
               <option value="Pure">Pure</option>
               <option value="Diluted">Diluted</option>
@@ -203,9 +204,36 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
           {formData.sectionSpecificFields.dilutionStatus === 'Diluted' && (
             <div>
               <label>Dilution Percentage (%)</label>
-              <input type="number" onChange={e => updateSpecificField('dilutionPercentage', parseFloat(e.target.value))} />
+              <input type="number" value={formData.sectionSpecificFields.dilutionPercentage || ''} onChange={e => updateSpecificField('dilutionPercentage', parseFloat(e.target.value))} />
             </div>
           )}
+        </div>
+      );
+    }
+
+    if (slug === 'medical') {
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div>
+            <label>Warranty Expiry Date</label>
+            <input type="date" value={formData.sectionSpecificFields.warrantyExpiry || ''} onChange={e => updateSpecificField('warrantyExpiry', e.target.value)} />
+          </div>
+          <div>
+            <label>Calibration Due Date</label>
+            <input type="date" value={formData.sectionSpecificFields.calibrationDue || ''} onChange={e => updateSpecificField('calibrationDue', e.target.value)} />
+          </div>
+          <div>
+            <label>Last Calibration Date</label>
+            <input type="date" value={formData.sectionSpecificFields.lastCalibration || ''} onChange={e => updateSpecificField('lastCalibration', e.target.value)} />
+          </div>
+          <div>
+            <label>Maintenance Interval (Days)</label>
+            <input type="number" value={formData.sectionSpecificFields.maintenanceInterval || ''} onChange={e => updateSpecificField('maintenanceInterval', parseInt(e.target.value))} />
+          </div>
+          <div>
+            <label>Regulatory ID</label>
+            <input type="text" value={formData.sectionSpecificFields.regulatoryId || ''} onChange={e => updateSpecificField('regulatoryId', e.target.value)} />
+          </div>
         </div>
       );
     }
@@ -261,6 +289,10 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string 
             <div>
               <label>Item Name *</label>
               <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+            </div>
+            <div>
+              <label>Image URL</label>
+              <input type="url" placeholder="https://example.com/image.jpg" value={formData.imageUrl || ''} onChange={e => setFormData({...formData, imageUrl: e.target.value})} />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>

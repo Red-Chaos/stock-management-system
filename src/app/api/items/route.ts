@@ -75,6 +75,9 @@ export async function POST(req: Request) {
         status,
         description: data.description,
         sectionSpecificFields: data.sectionSpecificFields || {},
+        images: data.imageUrl ? {
+          create: { url: data.imageUrl }
+        } : undefined,
       }
     });
 
