@@ -217,12 +217,15 @@ export default function TopHeader({
         </div>
         {time ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-            <div style={{ 
-              fontSize: '16px', 
-              fontWeight: 600, 
-              color: 'var(--text-primary)',
-              fontVariantNumeric: 'tabular-nums'
-            }}>
+            <div 
+              className="text-gradient-animate"
+              style={{ 
+                fontSize: '18px', 
+                fontWeight: 800, 
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '1px'
+              }}
+            >
               {formatTime(time, clockFormat)}
             </div>
           </div>
