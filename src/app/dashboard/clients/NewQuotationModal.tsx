@@ -105,7 +105,7 @@ export default function NewQuotationModal({ clients, stockItems }: { clients: an
                   <label>Client *</label>
                   <select required value={clientId} onChange={e => setClientId(e.target.value)}>
                     <option value="">Select Client...</option>
-                    {clients.map(c => <option key={c.id} value={c.id}>{c.name} ({c.organization || 'Individual'})</option>)}
+                    {clients.map((c: any) => <option key={c.id} value={c.id}>{c.name} ({c.organization || 'Individual'})</option>)}
                   </select>
                 </div>
                 <div>
@@ -127,13 +127,13 @@ export default function NewQuotationModal({ clients, stockItems }: { clients: an
                 </div>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {items.map((item, index) => (
+                  {items.map((item: any, index: number) => (
                     <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 1fr auto', gap: '12px', alignItems: 'flex-end', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px' }}>
                       <div>
                         <label style={{ fontSize: '0.75rem' }}>Stock Item (Optional)</label>
                         <select value={item.stockItemId} onChange={e => updateItem(index, 'stockItemId', e.target.value)}>
                           <option value="">Custom Item...</option>
-                          {stockItems.map(si => <option key={si.id} value={si.id}>{si.name}</option>)}
+                          {stockItems.map((si: any) => <option key={si.id} value={si.id}>{si.name}</option>)}
                         </select>
                       </div>
                       <div>

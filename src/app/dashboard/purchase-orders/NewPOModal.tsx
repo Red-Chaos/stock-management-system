@@ -154,7 +154,7 @@ export default function NewPOModal({ suppliers, stockItems }: { suppliers: any[]
                   <label>Supplier *</label>
                   <select required value={supplierId} onChange={e => setSupplierId(e.target.value)}>
                     <option value="">Select Supplier...</option>
-                    {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    {suppliers.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
                 </div>
                 <div>
@@ -185,13 +185,13 @@ export default function NewPOModal({ suppliers, stockItems }: { suppliers: any[]
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {items.map((item, index) => (
+                    {items.map((item: any, index: number) => (
                       <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 1fr auto', gap: '12px', alignItems: 'flex-end', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px' }}>
                         <div>
                           <label style={{ fontSize: '0.75rem' }}>Link to Stock Item</label>
                           <select value={item.stockItemId} onChange={e => updateItem(index, 'stockItemId', e.target.value)}>
                             <option value="">Custom Item...</option>
-                            {stockItems.map(si => <option key={si.id} value={si.id}>{si.name}</option>)}
+                            {stockItems.map((si: any) => <option key={si.id} value={si.id}>{si.name}</option>)}
                           </select>
                         </div>
                         <div>

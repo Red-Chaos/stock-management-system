@@ -88,7 +88,7 @@ export default async function PODetailPage({ params }: { params: Promise<{ id: s
             </tr>
           </thead>
           <tbody>
-            {po.items.map((item, i) => (
+            {po.items.map((item: any, i: number) => (
               <tr key={item.id} style={{ borderBottom: '1px solid #eee' }}>
                 <td style={{ padding: '12px', fontSize: '13px' }}>{item.itemName}</td>
                 <td style={{ padding: '12px', textAlign: 'center', fontSize: '13px' }}>{item.quantity}</td>

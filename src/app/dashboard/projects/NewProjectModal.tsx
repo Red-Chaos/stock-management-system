@@ -63,7 +63,7 @@ export default function NewProjectModal({ clients }: { clients: any[] }) {
                 <label>Client</label>
                 <select value={formData.clientId} onChange={e => setFormData({...formData, clientId: e.target.value})}>
                   <option value="">Select Client...</option>
-                  {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {clients.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div>
