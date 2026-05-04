@@ -1,0 +1,439 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  EMPLOYEE
+}
+
+enum StockStatus {
+  ACTIVE
+  LOW_STOCK
+  OUT_OF_STOCK
+}
+
+enum TransactionType {
+  INCOMING
+  OUTGOING
+}
+
+enum PurchaseOrderStatus {
+  DRAFT
+  SUBMITTED
+  CONFIRMED
+  SHIPPED
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CANCELLED
+}
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum AlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  password     String
+  role         UserRole   @default(EMPLOYEE)
+  avatar       String?
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  permissions  Json?      // Stores granular access rights
+  logs         ActivityLog[]
+  transactions StockTransaction[]
+  purchaseOrders PurchaseOrder[]
+  quotations   Quotation[]
+  projects     Project[]
+  alerts       StockAlert[]
+}
+
+model Supplier {
+  id              String    @id @default(cuid())
+  name            String    @unique
+  contactPerson   String?
+  email           String?
+  phone           String?
+  address         String?
+  city            String?
+  country         String?
+  website         String?
+  paymentTerms    String?
+  leadTimeDays    Int?
+  rating          Int?      @default(0) // 0-5 rating
+  notes           String?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  items           StockItem[]
+  purchaseOrders  PurchaseOrder[]
+}
+
+model Warehouse {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  code        String      @unique
+  address     String?
+  city        String?
+  country     String?
+  capacity    String?
+  manager     String?
+  phone       String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       StockItem[]
+}
+
+model Section {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  icon        String     @default("box")
+  color       String     @default("#00B0FF")
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  categories  Category[]
+  items       StockItem[]
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  name          String
+  description   String?
+  sectionId     String
+  section       Section       @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdAt     DateTime      @default(now())
+  subCategories SubCategory[]
+  items         StockItem[]
+
+  @@unique([name, sectionId])
+}
+
+model SubCategory {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  items       StockItem[]
+
+  @@unique([name, categoryId])
+}
+
+model StockItem {
+  id                    String            @id @default(cuid())
+  name                  String
+  itemCode              String            @unique
+  sectionId             String
+  section               Section           @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  categoryId            String
+  category              Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subCategoryId         String?
+  subCategory           SubCategory?      @relation(fields: [subCategoryId], references: [id], onDelete: SetNull)
+  manufacturer          String?
+  model                 String?
+  serialNumber          String?
+  price                 Float             @default(0)
+  priceCurrency         String            @default("USD")
+  quantity              Int               @default(0)
+  minStockLevel         Int               @default(5)
+  location              String?
+  supplierId            String?
+  supplier              Supplier?         @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  warehouseId           String?
+  warehouse             Warehouse?        @relation(fields: [warehouseId], references: [id], onDelete: SetNull)
+  countryOfOrigin       String?
+  logisticsCompany      String?
+  trackingNumber        String?
+  purchaseDate          DateTime?
+  warrantyExpiry        DateTime?
+  calibrationDate       DateTime?
+  nextCalibrationDue    DateTime?
+  status                StockStatus       @default(ACTIVE)
+  description           String?
+  sectionSpecificFields Json?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  images                StockImage[]
+  transactions          StockTransaction[]
+  parts                 ItemPart[]        @relation("ItemParts")
+  partOf                ItemPart[]        @relation("PartReference")
+  purchaseOrderItems    PurchaseOrderItem[]
+  quotationItems        QuotationItem[]
+  projectItems          ProjectItem[]
+  alerts                StockAlert[]
+}
+
+model ItemPart {
+  id          String     @id @default(cuid())
+  stockItemId String
+  stockItem   StockItem  @relation("ItemParts", fields: [stockItemId], references: [id], onDelete: Cascade)
+  partName    String
+  partItemId  String?
+  partItem    StockItem? @relation("PartReference", fields: [partItemId], references: [id], onDelete: SetNull)
+  isRequired  Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+}
+
+model StockImage {
+  id          String    @id @default(cuid())
+  stockItemId String
+  stockItem   StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  url         String
+  altText     String?
+  createdAt   DateTime  @default(now())
+}
+
+model StockTransaction {
+  id            String          @id @default(cuid())
+  stockItemId   String
+  stockItem     StockItem       @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  type          TransactionType
+  quantity      Int
+  reason        String?
+  performedById String
+  performedBy   User            @relation(fields: [performedById], references: [id])
+  createdAt     DateTime        @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ExchangeRateCache {
+  id        String   @id @default(cuid())
+  baseCurrency String
+  rates     Json
+  fetchedAt DateTime @default(now())
+
+  @@unique([baseCurrency])
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Purchase Order Management ──────────────────────────────────
+
+model PurchaseOrder {
+  id              String              @id @default(cuid())
+  orderNumber     String              @unique
+  supplierId      String
+  supplier        Supplier            @relation(fields: [supplierId], references: [id])
+  status          PurchaseOrderStatus @default(DRAFT)
+  currency        String              @default("USD")
+  subtotal        Float               @default(0)
+  shippingCost    Float               @default(0)
+  totalAmount     Float               @default(0)
+  expectedDate    DateTime?
+  receivedDate    DateTime?
+  shippingMethod  String?
+  trackingNumber  String?
+  notes           String?
+  createdById     String
+  createdBy       User                @relation(fields: [createdById], references: [id])
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  items           PurchaseOrderItem[]
+
+  @@index([supplierId])
+  @@index([status])
+}
+
+model PurchaseOrderItem {
+  id              String        @id @default(cuid())
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  stockItemId     String?
+  stockItem       StockItem?    @relation(fields: [stockItemId], references: [id], onDelete: SetNull)
+  itemName        String
+  quantity        Int
+  unitPrice       Float         @default(0)
+  receivedQty     Int           @default(0)
+  createdAt       DateTime      @default(now())
+}
+
+// ─── Client & Quotation Management ─────────────────────────────
+
+model Client {
+  id              String      @id @default(cuid())
+  name            String
+  contactPerson   String?
+  email           String?
+  phone           String?
+  address         String?
+  city            String?
+  country         String?
+  organization    String?     // e.g. "University of XYZ"
+  organizationType String?    // e.g. "University", "Industry", "Hospital"
+  notes           String?
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  quotations      Quotation[]
+  projects        Project[]
+}
+
+model Quotation {
+  id              String          @id @default(cuid())
+  quotationNumber String          @unique
+  clientId        String
+  client          Client          @relation(fields: [clientId], references: [id])
+  status          QuotationStatus @default(DRAFT)
+  currency        String          @default("USD")
+  subtotal        Float           @default(0)
+  discount        Float           @default(0)
+  tax             Float           @default(0)
+  totalAmount     Float           @default(0)
+  validUntil      DateTime?
+  notes           String?
+  createdById     String
+  createdBy       User            @relation(fields: [createdById], references: [id])
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  items           QuotationItem[]
+  projectId       String?
+  project         Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([clientId])
+  @@index([status])
+}
+
+model QuotationItem {
+  id            String    @id @default(cuid())
+  quotationId   String
+  quotation     Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  stockItemId   String?
+  stockItem     StockItem? @relation(fields: [stockItemId], references: [id], onDelete: SetNull)
+  itemName      String
+  description   String?
+  quantity      Int
+  unitPrice     Float     @default(0)
+  createdAt     DateTime  @default(now())
+}
+
+// ─── Lab Build Project Tracking ─────────────────────────────────
+
+model Project {
+  id              String        @id @default(cuid())
+  name            String
+  projectCode     String        @unique
+  clientId        String?
+  client          Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  status          ProjectStatus @default(PLANNING)
+  description     String?
+  labType         String?       // e.g. "Physics", "Chemistry", "Medical"
+  location        String?       // Where the lab is being built
+  startDate       DateTime?
+  expectedEndDate DateTime?
+  actualEndDate   DateTime?
+  budget          Float?
+  currency        String        @default("USD")
+  notes           String?
+  createdById     String
+  createdBy       User          @relation(fields: [createdById], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  items           ProjectItem[]
+  quotations      Quotation[]
+
+  @@index([clientId])
+  @@index([status])
+}
+
+model ProjectItem {
+  id            String    @id @default(cuid())
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  stockItemId   String?
+  stockItem     StockItem? @relation(fields: [stockItemId], references: [id], onDelete: SetNull)
+  itemName      String
+  quantity      Int       @default(1)
+  reservedQty   Int       @default(0)
+  dispatchedQty Int       @default(0)
+  installedQty  Int       @default(0)
+  notes         String?
+  createdAt     DateTime  @default(now())
+}
+
+// ─── Stock Alerts ───────────────────────────────────────────────
+
+model StockAlert {
+  id          String      @id @default(cuid())
+  stockItemId String
+  stockItem   StockItem   @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  type        String      // "LOW_STOCK", "OUT_OF_STOCK", "CALIBRATION_DUE", "WARRANTY_EXPIRING"
+  message     String
+  status      AlertStatus @default(ACTIVE)
+  acknowledgedById String?
+  acknowledgedBy   User?   @relation(fields: [acknowledgedById], references: [id])
+  acknowledgedAt   DateTime?
+  createdAt   DateTime    @default(now())
+
+  @@index([status])
+  @@index([stockItemId])
+}
+
+// ─── Recurring Order Templates ──────────────────────────────────
+
+model OrderTemplate {
+  id          String              @id @default(cuid())
+  name        String
+  supplierId  String?
+  description String?
+  currency    String              @default("USD")
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  items       OrderTemplateItem[]
+}
+
+model OrderTemplateItem {
+  id              String        @id @default(cuid())
+  templateId      String
+  template        OrderTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  stockItemId     String?
+  itemName        String
+  quantity        Int           @default(1)
+  unitPrice       Float         @default(0)
+  createdAt       DateTime      @default(now())
+}
