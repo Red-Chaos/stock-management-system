@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { SUPPORTED_CURRENCIES } from '@/lib/utils';
-import { getExchangeRates, convertCurrency } from '@/lib/currency';
+import { SUPPORTED_CURRENCIES, convertCurrency } from '@/lib/utils';
+import { getExchangeRates } from '@/lib/currency';
 
 export async function GET(req: Request) {
   try {

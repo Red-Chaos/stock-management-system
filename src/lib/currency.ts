@@ -50,11 +50,4 @@ export async function getExchangeRates(baseCurrency: string = 'USD'): Promise<Re
   }
 }
 
-export function convertCurrency(amount: number, from: string, to: string, rates: Record<string, number>): number {
-  if (from === to) return amount;
-  
-  const fromRate = rates[from] || 1;
-  const toRate = rates[to] || 1;
-  
-  return (amount / fromRate) * toRate;
-}
+

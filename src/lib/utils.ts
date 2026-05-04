@@ -12,6 +12,13 @@ export function getStockStatus(quantity: number, minStockLevel: number): 'ACTIVE
   return 'ACTIVE';
 }
 
+export function convertCurrency(amount: number, from: string, to: string, rates: Record<string, number>): number {
+  if (from === to) return amount;
+  const fromRate = rates[from] || 1;
+  const toRate = rates[to] || 1;
+  return (amount / fromRate) * toRate;
+}
+
 export function formatCurrency(amount: number, currency: string): string {
   const currencyMap: Record<string, { locale: string; code: string }> = {
     PKR: { locale: 'en-PK', code: 'PKR' },

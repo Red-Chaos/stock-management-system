@@ -4,8 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Trash2, Edit, CheckSquare, Square, Loader2, Warehouse, Activity } from 'lucide-react';
-import { convertCurrency } from '@/lib/currency';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, convertCurrency } from '@/lib/utils';
 
 export default function ItemsTableClient({ items, rates }: { items: any[], rates: any }) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);

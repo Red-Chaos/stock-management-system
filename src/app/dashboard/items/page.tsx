@@ -2,8 +2,8 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Package, Plus, Search, Filter } from 'lucide-react';
 import DevButtons from './DevButtons';
-import { getExchangeRates, convertCurrency } from '@/lib/currency';
-import { formatCurrency } from '@/lib/utils';
+import { getExchangeRates } from '@/lib/currency';
+import { formatCurrency, convertCurrency } from '@/lib/utils';
 import ItemsTableClient from './ItemsTableClient';
 
 export default async function ItemsPage(props: {

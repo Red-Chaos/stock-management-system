@@ -2,8 +2,8 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Edit, Trash2, Box, Info, MapPin, DollarSign, RefreshCw, Layers } from 'lucide-react';
-import { SUPPORTED_CURRENCIES, formatCurrency } from '@/lib/utils';
-import { getExchangeRates, convertCurrency } from '@/lib/currency';
+import { SUPPORTED_CURRENCIES, formatCurrency, convertCurrency } from '@/lib/utils';
+import { getExchangeRates } from '@/lib/currency';
 import TransactionForm from './TransactionForm';
 
 export default async function ItemDetailPage({ params }: { params: Promise<{ id: string }> }) {
