@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 import { Package, AlertTriangle, XCircle, Layers, Activity, DollarSign, FileText, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';

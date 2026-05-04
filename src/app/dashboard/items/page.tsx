@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { Package, Plus, Search, Filter } from 'lucide-react';
 import DevButtons from './DevButtons';

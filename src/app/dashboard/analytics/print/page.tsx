@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 import AnalyticsCharts from '../AnalyticsCharts';
 
 export default async function PrintAnalyticsPage() {

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Edit, Trash2, Box, Info, MapPin, DollarSign, RefreshCw, Layers } from 'lucide-react';

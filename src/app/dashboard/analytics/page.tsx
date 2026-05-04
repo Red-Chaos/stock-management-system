@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { BarChart3, Printer, PieChart, TrendingUp, DollarSign } from 'lucide-react';
 import AnalyticsCharts from './AnalyticsCharts';

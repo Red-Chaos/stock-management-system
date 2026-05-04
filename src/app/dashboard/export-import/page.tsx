@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+export const dynamic = 'force-dynamic';
 import { Download, Upload, AlertCircle, FileJson, FileSpreadsheet } from 'lucide-react';
 import ImportForm from './ImportForm';
 
